@@ -47,7 +47,7 @@ var addEvent = function (el, capture,needBar) {
             self.sy = event.pageY 
             self.ost = bar.offsetTop
         }
-        barContainer.onmousemove = function(event){
+        document.body.onmousemove = function(event){
             var y = event.pageY             
             if(self.sy !== ''){
                 self.movey = y-self.sy
@@ -65,16 +65,7 @@ var addEvent = function (el, capture,needBar) {
             }
             
         }
-        barContainer.onmouseup = function(){
-            self.sy = '' 
-        }
-        bar.onmouseup = function(){
-            self.sy = '' 
-        }
-        barContainer.onmouseleave = function(){
-            self.sy = '' 
-        }
-        barContainer.onmouseout = function(){
+        document.body.onmouseup = function(){
             self.sy = '' 
         }
     }
