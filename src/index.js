@@ -1,4 +1,13 @@
 var addEvent = function (el, capture,needBar) {
+
+    this.sy = ''    //鼠标位置Y
+    this.ost = ''   //滚动轴位置
+    this.movey = '' // y轴运动距离
+    this.afterCpTop = ''  // 滚动轴计算后位置
+    var self = this
+    if(!el){
+        throw Error('no found element')
+    }
     var content = document.querySelector('.content')
     // 生成滚动轴
     if(needBar){
@@ -18,9 +27,8 @@ var addEvent = function (el, capture,needBar) {
     }
     el.addEventListener(type, function (event) {
         event.stopPropagation()
-        var item = el.querySelectorAll('li')
         var viewh = el.offsetHeight
-        var totalh = item[0].offsetHeight * item.length
+        var totalh = content.offsetHeight
         var ph = (totalh - viewh) / 4
         var ev = _eventCompat(event)
         if (ev.delta > 0) {
@@ -35,40 +43,39 @@ var addEvent = function (el, capture,needBar) {
         
     }, capture || false)
     if(needBar){
-        var sy = '';
-        var ost = ''
         barContainer.onmousedown = function(event){
-            sy = event.pageY 
-            ost = bar.offsetTop
+            self.sy = event.pageY 
+            self.ost = bar.offsetTop
         }
-        var movey = ''
-        var _top = ''
         barContainer.onmousemove = function(event){
-            var y = event.pageY 
-            if(sy!=''){
-                movey = y-sy
-                _top = ost + movey
-                if(_top < 0){
-                    _top = 0
+            var y = event.pageY             
+            if(self.sy !== ''){
+                self.movey = y-self.sy
+                self.afterCpTop = self.ost + self.movey
+                if(self.afterCpTop < 0){
+                    self.afterCpTop = 0
                 }
-                if(_top > barContainer.offsetHeight - bar.offsetHeight){
-                    _top = barContainer.offsetHeight - bar.offsetHeight
+                if(self.afterCpTop > barContainer.offsetHeight - bar.offsetHeight){
+                    self.afterCpTop = barContainer.offsetHeight - bar.offsetHeight
                 }
                 
-                bar.style.top = _top + 'px'
-                el.scrollTop = _top*totalh/viewh
+                bar.style.top = self.afterCpTop + 'px'
+                el.scrollTop = self.afterCpTop*totalh/viewh
                 barContainer.style.top = el.scrollTop
             }
             
         }
+        barContainer.onmouseup = function(){
+            self.sy = '' 
+        }
         bar.onmouseup = function(){
-            sy = '' 
+            self.sy = '' 
         }
-        bar.onmouseleave = function(){
-            sy = '' 
+        barContainer.onmouseleave = function(){
+            self.sy = '' 
         }
-        bar.onmouseout = function(){
-            sy = '' 
+        barContainer.onmouseout = function(){
+            self.sy = '' 
         }
     }
     
@@ -88,4 +95,4 @@ var _eventCompat = function (event) {
     }
     return event
 }
-addEvent(document.querySelector('.dd'), false,false)
+addEvent(document.querySelector('.dd'), false,true)
