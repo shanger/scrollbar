@@ -29,7 +29,7 @@ var addEvent = function (el, capture,needBar) {
         event.stopPropagation()
         var viewh = el.offsetHeight
         var totalh = content.offsetHeight
-        var ph = (totalh - viewh) / 4
+        var ph = 100 //(totalh - viewh) / 4
         var ev = _eventCompat(event)
         if (ev.delta > 0) {
             el.scrollTop -= ph                        
