@@ -1,13 +1,9 @@
-*{
-    margin:0;
-    padding:0;
-}
+
 .dd{
     height: 300px;
     width: 500px;
     margin: 50px auto;
-    overflow: hidden;
-    position: relative;
+    
 }
 ul{
     width: 500px;
@@ -16,7 +12,14 @@ li{
     list-style: none;
     line-height: 50px;
 }
-.scrollbar{
+.sg-scrollbar {
+    overflow: hidden;
+    position: relative;
+}
+.sg-scrollbar .content{
+    margin:0;padding: 0;
+}
+.sg-scrollbar .scrollbar{
     position: absolute;
     z-index: 1;
     height: 100%;
@@ -24,12 +27,12 @@ li{
     top: 0;right: 0;
     background-color: rgba(0,0,0,.1);
 }
-.bar{
+.sg-scrollbar .bar{
     position: absolute;
     width: 6px;border-radius: 5px;
     top: 0;right: 0;
     background-color: rgba(255, 102, 0, 0.39)
 }
-.bar:hover{
+.sg-scrollbar .bar:hover{
     background-color: #ff6600;
 }

@@ -8,7 +8,9 @@ var addEvent = function (el, capture,needBar) {
     if(!el){
         throw Error('no found element')
     }
-    var content = document.querySelector('.content')
+    var elClass = el.getAttribute('class')
+    el.setAttribute('class',elClass + ' sg-scrollbar')
+    var content = el.querySelector('.content')
     // 生成滚动轴
     if(needBar){
         var barContainer = document.createElement('div')
