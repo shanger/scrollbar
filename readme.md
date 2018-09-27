@@ -1,10 +1,9 @@
 # MyScrollbar
 
-> 简单 自定义滚动轴
+> 简单的自定义滚动轴
 
-## Build Setup
 
-#how to use 
+# how to use 
 npm install scrollbar
 
 `<script src="src/index.js"></script>`
