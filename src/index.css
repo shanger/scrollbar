@@ -25,14 +25,13 @@ li{
     height: 100%;
     width: 6px;border-radius: 5px;
     top: 0;right: 0;
-    background-color: rgba(0,0,0,.1);
 }
 .sg-scrollbar .bar{
     position: absolute;
     width: 6px;border-radius: 5px;
     top: 0;right: 0;
-    background-color: rgba(255, 102, 0, 0.39)
+    opacity: 0.4;
 }
 .sg-scrollbar .bar:hover{
-    background-color: #ff6600;
+    opacity: 1;
 }
