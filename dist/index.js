@@ -29,6 +29,10 @@ function MyScrollbar (args) {
     if(!content){
         throw Error('please add the class name "content" to your child element ')
     }
+    // 内容高度高于容器高度才展示滚动轴
+    if(el.offsetHeight >= content.offsetHeight){
+        needBar = false
+    }
 
     // 生成滚动轴
     if(needBar){
