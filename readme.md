@@ -12,9 +12,8 @@ npm install scrollbar
 
 `import MyScrollbar from 'sg-scrollbar'`
 
-`new MyScrollbar({
+`var mybar = new MyScrollbar({
     dom:document.querySelector('.dd'),
-    capture:false,
     needBar:true
 })
 `
@@ -24,9 +23,8 @@ npm install scrollbar
 ## 直接引入
 `<script src="src/index.js"></script>`
 
-`new MyScrollbar({
+`var mybar = new MyScrollbar({
     dom:document.querySelector('.dd'),
-    capture:false,
     needBar:true
 })
 `
