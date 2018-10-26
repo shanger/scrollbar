@@ -14,3 +14,5 @@ npm install scrollbar
     needBar:true
 })
 `
+`mybar.init()
+`

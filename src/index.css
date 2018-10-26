@@ -19,19 +19,19 @@ li{
 .sg-scrollbar .content{
     margin:0;padding: 0;
 }
-.sg-scrollbar .scrollbar{
+.sg-scrollbar .sg-bar-contanier{
     position: absolute;
     z-index: 1;
     height: 100%;
     width: 6px;border-radius: 5px;
     top: 0;right: 0;
 }
-.sg-scrollbar .bar{
+.sg-scrollbar .sg-bar{
     position: absolute;
     width: 6px;border-radius: 5px;
     top: 0;right: 0;
     opacity: 0.4;
 }
-.sg-scrollbar .bar:hover{
+.sg-scrollbar .sg-bar:hover{
     opacity: 1;
 }
