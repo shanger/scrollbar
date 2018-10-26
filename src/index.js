@@ -120,9 +120,3 @@ function addevent (el, eventName, callback) {
 }
 
 // var _eventCompat = function (event) 
-var mybar = new MyScrollbar({
-    dom:document.querySelector('.dd'),
-    capture:false,
-    needBar:true
-})
-mybar.init()

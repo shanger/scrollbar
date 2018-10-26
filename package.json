@@ -1,22 +1,26 @@
 {
-  "name": "scrollbar",
+  "name": "sg-scrollbar",
   "version": "1.0.0",
   "description": "custom srcoll bar styles",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "uglify":"uglifyjs ./src/index.js -o ./dist/index.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/shanger/scrollbar.git"
   },
   "keywords": [
-    "scrollbar"
+    "scrollbar","custom","simple"
   ],
   "author": "shanger",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/shanger/scrollbar/issues"
   },
-  "homepage": "https://github.com/shanger/scrollbar#readme"
+  "homepage": "https://github.com/shanger/scrollbar#readme",
+  "devDependencies": {
+    "uglify-js": "^3.4.9"
+  }
 }

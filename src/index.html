@@ -32,5 +32,13 @@
             </ul>
         </div>
         <script src="./index.js"></script>
+        <script>
+            var mybar = new MyScrollbar({
+                dom:document.querySelector('.dd'),
+                capture:false,
+                needBar:true
+            })
+            mybar.init()
+        </script>
     </body>
 </html>
