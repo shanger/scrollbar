@@ -13,7 +13,7 @@ function MyScrollbar (args) {
     this.needBar = args.needBar || false
     this.barColor = args.barColor || '#ff6600'
     this.barbgColor = args.barbgColor || 'rgba(0,0,0,.1)'
-
+    
     this.sy = ''    //鼠标位置Y
     this.ost = ''   //滚动轴位置
     this.movey = '' // y轴运动距离
@@ -26,6 +26,10 @@ MyScrollbar.prototype.init = function(){
     }
     var elClass = this.el.getAttribute('class')
     this.el.setAttribute('class',elClass + ' sg-scrollbar')
+    this.setStyle(this.el,{
+        overflow: 'hidden',
+        position: 'relative'
+    })
     var content = this.el.querySelector('.content')
     if(!content){
         throw Error('please add the class name "content" to your child element ')
@@ -40,37 +44,41 @@ MyScrollbar.prototype.init = function(){
         var barContainer = document.createElement('div')
         var bar = document.createElement('div')
         barContainer.setAttribute('class','sg-bar-contanier')
+        this.setStyle(barContainer,{
+            position: 'absolute',
+            zIndex: 1,
+            height: '100%',
+            width: '6px',
+            borderRadius: '5px',
+            top: 0,
+            right: 0
+        })
         barContainer.style.backgroundColor = this.barbgColor
         bar.setAttribute('class','sg-bar')
+        this.setStyle(bar,{
+            position: 'absolute',
+            width: '6px',
+            borderRadius: '5px',
+            top: 0,
+            right: 0,
+            opacity: 0.4
+        })
         bar.style.backgroundColor = this.barColor
         barContainer.appendChild(bar)
         this.el.appendChild(barContainer)
         var viewh = this.el.offsetHeight
         var totalh = content.offsetHeight
         bar.style.height = viewh/totalh*100 + '%'
-    }
-    var type = 'mousewheel'
-    if (type === 'mousewheel' && document.mozFullScreen !== undefined) {
-        type = 'DOMMouseScroll'
-    }
-    addevent(this.el, type, function (event) {
-        event.stopPropagation()
-        var ph = 100 
-        var ev = self.mouseEventCompat(event)
-        if (ev.delta > 0) {
-            self.el.scrollTop -= ph                        
-        } else {
-            self.el.scrollTop += ph
-        }
-        if(self.needBar){
-            barContainer.style.top = self.el.scrollTop + 'px'
-            bar.style.top = self.el.scrollTop * self.el.offsetHeight/content.offsetHeight + 'px'
-        }
-    })
-    if(this.needBar){
+
+        // 绑定事件
         addevent(barContainer, 'mousedown', function (event) {
             self.sy = event.pageY 
             self.ost = bar.offsetTop
+        })
+        addevent(barContainer, 'mouseover', function (event) {
+            self.setStyle(bar,{
+                opacity: 1
+            })
         })
         addevent(document.body, 'mousemove', function (event) {
             var y = event.pageY             
@@ -91,9 +99,29 @@ MyScrollbar.prototype.init = function(){
         })
         addevent(document.body, 'mouseup', function (event) {
             self.sy = ''
+            self.setStyle(bar,{
+                opacity: 0.4
+            })
         })
     }
-    
+    var type = 'mousewheel'
+    if (type === 'mousewheel' && document.mozFullScreen !== undefined) {
+        type = 'DOMMouseScroll'
+    }
+    addevent(this.el, type, function (event) {
+        event.stopPropagation()
+        var ph = 100 
+        var ev = self.mouseEventCompat(event)
+        if (ev.delta > 0) {
+            self.el.scrollTop -= ph                        
+        } else {
+            self.el.scrollTop += ph
+        }
+        if(self.needBar){
+            barContainer.style.top = self.el.scrollTop + 'px'
+            bar.style.top = self.el.scrollTop * self.el.offsetHeight/content.offsetHeight + 'px'
+        }
+    })    
 }
 MyScrollbar.prototype.mouseEventCompat = function(event){
     var type = event.type
@@ -110,6 +138,11 @@ MyScrollbar.prototype.mouseEventCompat = function(event){
     }
     return event
 }
+MyScrollbar.prototype.setStyle = function(el,style){
+    for(var key in style){
+        el.style[key] = style[key]
+    }
+} 
 
 function addevent (el, eventName, callback) {
     if (el.addEventListener) {
