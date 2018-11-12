@@ -51,9 +51,9 @@ MyScrollbar.prototype.init = function(){
             width: '6px',
             borderRadius: '5px',
             top: 0,
-            right: 0
+            right: 0,
+            backgroundColor: this.barbgColor
         })
-        barContainer.style.backgroundColor = this.barbgColor
         bar.setAttribute('class','sg-bar')
         this.setStyle(bar,{
             position: 'absolute',
@@ -61,9 +61,9 @@ MyScrollbar.prototype.init = function(){
             borderRadius: '5px',
             top: 0,
             right: 0,
-            opacity: 0.4
+            opacity: 0.4,
+            backgroundColor: this.barColor
         })
-        bar.style.backgroundColor = this.barColor
         barContainer.appendChild(bar)
         this.el.appendChild(barContainer)
         var viewh = this.el.offsetHeight
@@ -80,48 +80,14 @@ MyScrollbar.prototype.init = function(){
                 opacity: 1
             })
         })
-        addevent(document.body, 'mousemove', function (event) {
-            var y = event.pageY             
-            if(self.sy !== ''){
-                self.movey = y-self.sy
-                self.afterCpTop = self.ost + self.movey
-                if(self.afterCpTop < 0){
-                    self.afterCpTop = 0
-                }
-                if(self.afterCpTop > barContainer.offsetHeight - bar.offsetHeight){
-                    self.afterCpTop = barContainer.offsetHeight - bar.offsetHeight
-                }
-                
-                bar.style.top = self.afterCpTop + 'px'
-                self.el.scrollTop = self.afterCpTop*totalh/viewh
-                barContainer.style.top = self.el.scrollTop + 'px'
-            }
-        })
-        addevent(document.body, 'mouseup', function (event) {
-            self.sy = ''
-            self.setStyle(bar,{
-                opacity: 0.4
-            })
-        })
+        addevent(document.body, 'mousemove', this.bodyMouseMove.bind(this))
+        addevent(document.body, 'mouseup', this.bodyMouseUp.bind(this))
     }
     var type = 'mousewheel'
     if (type === 'mousewheel' && document.mozFullScreen !== undefined) {
         type = 'DOMMouseScroll'
     }
-    addevent(this.el, type, function (event) {
-        event.stopPropagation()
-        var ph = 100 
-        var ev = self.mouseEventCompat(event)
-        if (ev.delta > 0) {
-            self.el.scrollTop -= ph                        
-        } else {
-            self.el.scrollTop += ph
-        }
-        if(self.needBar){
-            barContainer.style.top = self.el.scrollTop + 'px'
-            bar.style.top = self.el.scrollTop * self.el.offsetHeight/content.offsetHeight + 'px'
-        }
-    })    
+    addevent(this.el, type, this.mainOption.bind(this))    
 }
 MyScrollbar.prototype.mouseEventCompat = function(event){
     var type = event.type
@@ -142,13 +108,84 @@ MyScrollbar.prototype.setStyle = function(el,style){
     for(var key in style){
         el.style[key] = style[key]
     }
-} 
+}
+MyScrollbar.prototype.mainOption = function(event){
+    event.stopPropagation()
+    var content = document.querySelector('.content')
+    var ph = 100 
+    var ev = this.mouseEventCompat(event)
+    if (ev.delta > 0) {
+        this.el.scrollTop -= ph                        
+    } else {
+        this.el.scrollTop += ph
+    }
+    if(this.needBar){
+        var barContainer = document.querySelector('.sg-scrollbar .sg-bar-contanier')
+        var bar = document.querySelector('.sg-scrollbar .sg-bar')
+        barContainer.style.top = this.el.scrollTop + 'px'
+        bar.style.top = this.el.scrollTop * this.el.offsetHeight/content.offsetHeight + 'px'
+    }
+}
+MyScrollbar.prototype.bodyMouseMove = function(event){
+    var barContainer = document.querySelector('.sg-scrollbar .sg-bar-contanier')
+    var bar = document.querySelector('.sg-scrollbar .sg-bar')
+    if(barContainer){
+        var y = event.pageY
+        var viewh = this.el.offsetHeight
+        var totalh = document.querySelector('.content').offsetHeight          
+        if(this.sy !== ''){
+            this.movey = y-this.sy
+            this.afterCpTop = this.ost + this.movey
+            if(this.afterCpTop < 0){
+                this.afterCpTop = 0
+            }
+            if(this.afterCpTop > barContainer.offsetHeight - bar.offsetHeight){
+                this.afterCpTop = barContainer.offsetHeight - bar.offsetHeight
+            }
+            
+            bar.style.top = this.afterCpTop + 'px'
+            this.el.scrollTop = this.afterCpTop*totalh/viewh
+            barContainer.style.top = this.el.scrollTop + 'px'
+        }
+    }
+    
+}
+
+MyScrollbar.prototype.bodyMouseUp = function(event){
+    var bar = document.querySelector('.sg-scrollbar .sg-bar')
+    if(bar){
+        this.sy = ''
+        this.setStyle(bar,{
+            opacity: 0.4
+        })
+    }
+    
+}
+
+// 销毁
+MyScrollbar.prototype.destory = function(){
+    if(this.needBar){
+        offEvent(document.body, 'mousemove', this.bodyMouseMove.bind(this))
+        offEvent(document.body, 'mouseup', this.bodyMouseUp.bind(this))
+        var bar = document.querySelector('.sg-bar-contanier')
+        bar&&this.el.removeChild(bar)
+    }
+    var elClass = this.el.getAttribute('class')
+    this.el.setAttribute('class',elClass.replace(/sg-scrollbar/,''))    
+}
 
 function addevent (el, eventName, callback) {
     if (el.addEventListener) {
       el.addEventListener(eventName, callback, false)
     } else if (el.attachEvent) {
       el.attachEvent('on' + eventName, callback)
+    }
+}
+function offEvent (el, eventName, callback) {
+    if (el.removeEventListener) {
+      el.removeEventListener(eventName, callback, false)
+    } else if (el.attachEvent) {
+      el.detachEvent('on' + eventName, callback)
     }
 }
 
