@@ -18,6 +18,7 @@ function MyScrollbar (args) {
     this.ost = ''   //滚动轴位置
     this.movey = '' // y轴运动距离
     this.afterCpTop = ''  // 滚动轴计算后位置
+    this.handlers = []
 }
 MyScrollbar.prototype.init = function(){
     var self = this 
@@ -71,23 +72,62 @@ MyScrollbar.prototype.init = function(){
         bar.style.height = viewh/totalh*100 + '%'
 
         // 绑定事件
-        addevent(barContainer, 'mousedown', function (event) {
+        this.addevent(barContainer, 'mousedown', function (event) {
+            var event = window.event || event
             self.sy = event.pageY 
             self.ost = bar.offsetTop
         })
-        addevent(barContainer, 'mouseover', function (event) {
+        this.addevent(barContainer, 'mouseover', function () {
             self.setStyle(bar,{
                 opacity: 1
             })
         })
-        addevent(document.body, 'mousemove', this.bodyMouseMove.bind(this))
-        addevent(document.body, 'mouseup', this.bodyMouseUp.bind(this))
+        this.addevent(document.body, 'mousemove', function(event){
+            var event = window.event || event
+            var y = event.pageY    
+            if(self.sy !== ''){
+                self.movey = y-self.sy
+                self.afterCpTop = self.ost + self.movey
+                if(self.afterCpTop < 0){
+                    self.afterCpTop = 0
+                }
+                if(self.afterCpTop > barContainer.offsetHeight - bar.offsetHeight){
+                    self.afterCpTop = barContainer.offsetHeight - bar.offsetHeight
+                }
+                
+                bar.style.top = self.afterCpTop + 'px'
+                self.el.scrollTop = self.afterCpTop*totalh/viewh
+                barContainer.style.top = self.el.scrollTop + 'px'
+            }
+        })
+        this.addevent(document.body, 'mouseup', function(){
+            self.sy = ''
+            self.setStyle(bar,{
+                opacity: 0.4
+            })
+        })
     }
     var type = 'mousewheel'
     if (type === 'mousewheel' && document.mozFullScreen !== undefined) {
         type = 'DOMMouseScroll'
     }
-    addevent(this.el, type, this.mainOption.bind(this))    
+    this.addevent(this.el, type, function(event){
+        event.stopPropagation()
+        var content = document.querySelector('.content')
+        var ph = 100 
+        var ev = self.mouseEventCompat(event)
+        if (ev.delta > 0) {
+            self.el.scrollTop -= ph                        
+        } else {
+            self.el.scrollTop += ph
+        }
+        if(self.needBar){
+            var barContainer = document.querySelector('.sg-scrollbar .sg-bar-contanier')
+            var bar = document.querySelector('.sg-scrollbar .sg-bar')
+            barContainer.style.top = self.el.scrollTop + 'px'
+            bar.style.top = self.el.scrollTop * self.el.offsetHeight/content.offsetHeight + 'px'
+        }
+    })    
 }
 MyScrollbar.prototype.mouseEventCompat = function(event){
     var type = event.type
@@ -109,48 +149,6 @@ MyScrollbar.prototype.setStyle = function(el,style){
         el.style[key] = style[key]
     }
 }
-MyScrollbar.prototype.mainOption = function(event){
-    event.stopPropagation()
-    var content = document.querySelector('.content')
-    var ph = 100 
-    var ev = this.mouseEventCompat(event)
-    if (ev.delta > 0) {
-        this.el.scrollTop -= ph                        
-    } else {
-        this.el.scrollTop += ph
-    }
-    if(this.needBar){
-        var barContainer = document.querySelector('.sg-scrollbar .sg-bar-contanier')
-        var bar = document.querySelector('.sg-scrollbar .sg-bar')
-        barContainer.style.top = this.el.scrollTop + 'px'
-        bar.style.top = this.el.scrollTop * this.el.offsetHeight/content.offsetHeight + 'px'
-    }
-}
-MyScrollbar.prototype.bodyMouseMove = function(event){
-    var barContainer = document.querySelector('.sg-scrollbar .sg-bar-contanier')
-    var bar = document.querySelector('.sg-scrollbar .sg-bar')
-    if(barContainer){
-        var y = event.pageY
-        var viewh = this.el.offsetHeight
-        var totalh = document.querySelector('.content').offsetHeight          
-        if(this.sy !== ''){
-            this.movey = y-this.sy
-            this.afterCpTop = this.ost + this.movey
-            if(this.afterCpTop < 0){
-                this.afterCpTop = 0
-            }
-            if(this.afterCpTop > barContainer.offsetHeight - bar.offsetHeight){
-                this.afterCpTop = barContainer.offsetHeight - bar.offsetHeight
-            }
-            
-            bar.style.top = this.afterCpTop + 'px'
-            this.el.scrollTop = this.afterCpTop*totalh/viewh
-            barContainer.style.top = this.el.scrollTop + 'px'
-        }
-    }
-    
-}
-
 MyScrollbar.prototype.bodyMouseUp = function(event){
     var bar = document.querySelector('.sg-scrollbar .sg-bar')
     if(bar){
@@ -165,8 +163,11 @@ MyScrollbar.prototype.bodyMouseUp = function(event){
 // 销毁
 MyScrollbar.prototype.destory = function(){
     if(this.needBar){
-        offEvent(document.body, 'mousemove', this.bodyMouseMove.bind(this))
-        offEvent(document.body, 'mouseup', this.bodyMouseUp.bind(this))
+        this.handlers.forEach(ele=>{
+            this.offEvent(ele.el,ele.event,ele.callback)
+        })
+        this.offEvent(document.body, 'mousemove')
+        this.offEvent(document.body, 'mouseup')
         var bar = document.querySelector('.sg-bar-contanier')
         bar&&this.el.removeChild(bar)
     }
@@ -174,14 +175,19 @@ MyScrollbar.prototype.destory = function(){
     this.el.setAttribute('class',elClass.replace(/sg-scrollbar/,''))    
 }
 
-function addevent (el, eventName, callback) {
+MyScrollbar.prototype.addevent = function (el, eventName, callback) {
+    this.handlers.push({
+        el:el,
+        event:eventName,
+        callback:callback
+    })
     if (el.addEventListener) {
       el.addEventListener(eventName, callback, false)
     } else if (el.attachEvent) {
       el.attachEvent('on' + eventName, callback)
     }
 }
-function offEvent (el, eventName, callback) {
+MyScrollbar.prototype.offEvent =function (el, eventName,callback) {
     if (el.removeEventListener) {
       el.removeEventListener(eventName, callback, false)
     } else if (el.attachEvent) {

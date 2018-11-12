@@ -31,3 +31,9 @@ npm install scrollbar
 
 `mybar.init()
 `
+
+# destory
+
+`mybar.destory()`
+
+`mybar = null`
